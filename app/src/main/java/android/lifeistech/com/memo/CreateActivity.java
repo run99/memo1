@@ -10,7 +10,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import io.realm.Realm;
+
 public class CreateActivity extends AppCompatActivity {
+
+    public Realm realm;
 
     public EditText titleEditText;
     public EditText contentEditText;
@@ -20,8 +24,23 @@ public class CreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
+        realm = Realm.getDefaultInstance();
+
         titleEditText = (EditText) findViewById(R.id.titleEditText);
         contentEditText =(EditText) findViewById(R.id.contentEditText);
+    }
+
+    public void save(final String title, final String updateDate, final String content){
+
+        realm.executeTransaction(new Realm.Transaction(){
+            @Override
+            public void execute(Realm bgRealm){
+                Memo memo = realm.createObject(Memo.class);
+                memo.title = title;
+                memo.updateDate = updateDate;
+                memo.content = content;
+            }
+        });
     }
 
     public void create(View view){
@@ -34,6 +53,10 @@ public class CreateActivity extends AppCompatActivity {
         String content = contentEditText.getText().toString();
 
         check (title, updateDate, content);
+
+        save(title, updateDate, content);
+
+        finish();
     }
 
     public void check(String title, String updateDate,String content){
@@ -51,5 +74,6 @@ public class CreateActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        realm.close();
     }
 }
