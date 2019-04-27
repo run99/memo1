@@ -27,12 +27,14 @@ public class DetailActivity extends AppCompatActivity {
     public void showData(){
         final Memo memo = realm.where(Memo.class).equalTo("updateDate",
                 getIntent().getStringExtra("updateDate")).findFirst();
+
         titleText.setText(memo.title);
         contentText.setText(memo.content);
     }
 
     public void update(View view){
-        final Memo memo =realm.where(Memo.class).equalTo("updateDate", getIntent().getStringExtra("updateData")).findFirst();
+        final Memo memo = realm.where(Memo.class).equalTo("updateDate",
+                getIntent().getStringExtra("updateDate")).findFirst();
 
         realm.executeTransaction(new Realm.Transaction() {
 

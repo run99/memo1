@@ -3,8 +3,10 @@ package android.lifeistech.com.memo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.ListView;
 
 import java.util.List;
@@ -18,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
 
     public ListView listView;
 
+    public CheckBox checkBox;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +30,28 @@ public class MainActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
 
         listView = (ListView) findViewById(R.id.listView);
+
+        checkBox = (CheckBox)findViewById(R.id.checkBox);
+
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final boolean check = checkBox.isChecked();
+                Log.d("check", String.valueOf(check));
+
+
+                final Memo memo = realm.where(Memo.class).findFirst();
+
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm){
+                        memo.isCheck = check;
+                    }
+                });
+            }
+        });
+
+
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -38,7 +64,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
     }
+
+    void setMemo(){
+        final Memo memo = realm.where(Memo.class).findFirst();
+
+        if(memo != null){
+            checkBox.setChecked(memo.isCheck);
+
+        }
+    }
+
+
 
     public void setMemoList(){
         RealmResults<Memo> results = realm.where(Memo.class).findAll();
@@ -54,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         setMemoList();
+        setMemo();
     }
 
     @Override
